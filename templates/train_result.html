@@ -1,0 +1,16 @@
+<!-- templates/train_result.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Model Training Result</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Model Training Complete</h1>
+        <p><strong>R² Score:</strong> {{ accuracy }}</p>
+        <a href="/">Go Back</a>
+    </div>
+</body>
+</html>

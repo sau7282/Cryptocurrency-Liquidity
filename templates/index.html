@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cryptocurrency Liquidity Prediction</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}"> <!-- Link to external CSS -->
+</head>
+<body>
+
+    <div class="main-container">
+        <h1>Cryptocurrency Liquidity Prediction</h1>
+
+        <!-- Prediction Form -->
+        <div class="form-container">
+            <form action="/predict" method="POST">
+                <div class="form-group">
+                    <label for="price">Price:</label>
+                    <input type="text" id="price" name="price" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="1h">1h:</label>
+                    <input type="text" id="1h" name="1h" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="24h">24h:</label>
+                    <input type="text" id="24h" name="24h" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="7d">7d:</label>
+                    <input type="text" id="7d" name="7d" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="24h_volume">24h Volume:</label>
+                    <input type="text" id="24h_volume" name="24h_volume" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="mkt_cap">Market Cap:</label>
+                    <input type="text" id="mkt_cap" name="mkt_cap" required>
+                </div>
+
+                <button type="submit" class="btn-submit">Predict</button>
+            </form>
+
+            {% if prediction %}
+                <div id="prediction-result">
+                    <h3>Prediction: {{ prediction }}</h3>
+                </div>
+            {% endif %}
+
+            {% if error %}
+                <div id="error-message" class="error-message">
+                    <h3>{{ error }}</h3>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Train Model Section -->
+        <div class="train-model-container">
+            <h2>Train the Model</h2>
+            <form action="/train" method="POST">
+                <button type="submit" class="btn-train">Train Model</button>
+            </form>
+
+            {% if train_status %}
+                <div id="train-status" class="train-status">
+                    <h3>{{ train_status }}</h3>
+                </div>
+            {% endif %}
+        </div>
+
+    </div>
+
+</body>
+</html>
