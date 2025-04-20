@@ -16,11 +16,35 @@ This project is a machine learning application built using **Flask** to predict 
 
 ## 📁 Project Structure
 
-Cryptocurrency-Liquidity/ │├── app.py # Main Flask application ├── requirements.txt # Python dependencies ├── README.md # Project documentation │ ├── data/ │ └── cleaned_cryptocurrency_data.csv # Input dataset │ ├── models/ │ └── trained_model.pkl # Trained ML model │ ├── logging/ │ └── log_YYYY-MM-DD_HH-MM-SS.log # Runtime logs │ ├── templates/ │ ├── index.html # Input form page │ ├── prediction_result.html # Output page for prediction │ └── train_result.html # Output page for training accuracy │ └── src/ ├── data_preprocessing.py # Input scaling and transformation ├── data_validation.py # Input validation ├── feature_engineering.py # Feature engineering logic ├── model_trainer.py # Model training + saving └── predict.py # Prediction using trained model
+Cryptocurrency-Liquidity/
+│
+├── app.py                        # Main Flask application
+├── requirements.txt              # Project dependencies
+├── README.md                     # Project documentation
+│
+├── data/
+│   └── cleaned_cryptocurrency_data.csv   # Cleaned dataset used for training/prediction
+│
+├── models/
+│   └── trained_model.pkl         # Saved trained model
+│
+├── logging/
+│   └── log_<timestamp>.log       # Timestamped log files
+│
+├── templates/                    # HTML templates for Flask
+│   ├── index.html                # Input form for prediction
+│   ├── prediction_result.html    # Output of prediction
+│   └── train_result.html         # Output of training (accuracy)
+│
+└── src/                          # Source code modules
+    ├── data_preprocessing.py     # Preprocessing logic (e.g., scaling)
+    ├── data_validation.py        # Input validation logic
+    ├── feature_engineering.py    # Feature engineering functions
+    ├── model_trainer.py          # Model training and saving
+    └── predict.py                # Inference using the trained model
 
-yaml
-Copy
-Edit
+
+
 
 ---
 
