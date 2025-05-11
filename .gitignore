@@ -41,5 +41,3 @@ Thumbs.db
 *.sublime-project
 *.sublime-workspace
 
-# PDF Reports
-*.pdf

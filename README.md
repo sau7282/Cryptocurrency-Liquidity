@@ -29,7 +29,7 @@ Cryptocurrency-Liquidity/
 │   └── trained_model.pkl         # Saved trained model
 │
 ├── logging/
-│   └── log_<timestamp>.log       # Timestamped log files
+│   └── app.log       # Timestamped log files
 │
 ├── templates/                    # HTML templates for Flask
 │   ├── index.html                # Input form for prediction
