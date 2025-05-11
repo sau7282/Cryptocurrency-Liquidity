@@ -4,12 +4,8 @@ import logging
 from flask import Flask, render_template, request, jsonify
 import joblib
 import pandas as pd
-from datetime import datetime
 
 # Project modules
-from src.predict import make_predictions
-from src.data_preprocessing import preprocess_data
-from src.data_validation import validate_input_data
 from src.feature_engineering import feature_engineering
 from src.model_trainer import build_and_save_model
 
@@ -21,8 +17,7 @@ app = Flask(__name__)
 # Set up logging
 log_dir = "logging"
 os.makedirs(log_dir, exist_ok=True)
-# log_filename = datetime.now().strftime("log_%Y-%m-%d_%H-%M-%S.log")
-# log_file = os.path.join(log_dir, log_filename)
+
 log_file = 'logging/app.log'
 logging.basicConfig(
     level=logging.DEBUG,
@@ -35,15 +30,18 @@ logging.basicConfig(
 
 # Paths
 MODEL_PATH = os.path.join(os.getcwd(), 'models', 'trained_model.pkl')
-DATA_PATH = os.path.join(os.getcwd(), 'data', 'cleaned_cryptocurrency_data.csv')  
+DATA_PATH = os.path.join(os.getcwd(), 'data', 'cleaned_cryptocurrency_data.csv')
 
 # Load or train model
 try:
     if not os.path.exists(MODEL_PATH):
         logging.info("Model not found. Training a new model...")
         build_and_save_model(DATA_PATH, MODEL_PATH)
-    model = joblib.load(MODEL_PATH)
-    logging.info("Model loaded successfully.")
+    model_data = joblib.load(MODEL_PATH)
+    model = model_data['model']
+    scaler = model_data['scaler']
+    feature_columns = model_data['features']
+    logging.info("Bagging model loaded successfully.")
 except Exception as e:
     logging.error(f"Failed to load or build model: {e}")
     sys.exit(1)
@@ -68,31 +66,33 @@ def predict():
         }
         app.logger.debug(f"Received data: {data}")
 
-        # Validate input
-        if not validate_input_data(data):
-            app.logger.warning("Invalid data format received.")
-            return jsonify({"error": "Invalid input. Please check required features."}), 400
-        
-        # Preprocess
-        preprocessed_data = preprocess_data(data)
-        app.logger.debug(f"Data after preprocessing: {preprocessed_data}")
+        # Convert input to DataFrame
+        df = pd.DataFrame([data])
 
-        # Feature Engineering
-        features = feature_engineering(preprocessed_data)
-        app.logger.debug(f"Features after engineering: {features}")
+        # Feature Engineering (set is_training=False for prediction)
+        df = feature_engineering(df, is_training=False)
 
-        # Prediction
-        prediction = make_predictions(features, model)
-        app.logger.info(f"Prediction made: {prediction}")
+        # Ensure only the required features are used
+        df = df[feature_columns]
 
-        # Render the HTML page with the prediction result
-        return render_template('prediction_result.html', prediction=prediction[0])
+        # Scale the input data
+        df_scaled = scaler.transform(df)
+
+        # Predictions
+        bagging_prediction = model.predict(df_scaled)[0]
+
+        app.logger.info(f"Bagging Prediction: {bagging_prediction}")
+
+        # Render the HTML page with the prediction results
+        return render_template(
+            'prediction_result.html',
+            bagging_prediction=round(bagging_prediction, 4)
+        )
 
     except Exception as e:
         app.logger.error(f"Error occurred during prediction: {e}")
-        return jsonify({"error": str(e)}), 500
+        return render_template('error.html', message=str(e)), 500
 
-# Optional: Retrain via API
 @app.route('/train', methods=['POST'])
 def train_model():
     try:
@@ -104,6 +104,52 @@ def train_model():
 
     except Exception as e:
         app.logger.error(f"Error occurred during model training: {e}")
+        return render_template('error.html', message=str(e)), 500
+    
+@app.route('/batch_predict', methods=['POST'])
+def batch_predict():
+    try:
+        # Check if a file is uploaded
+        if 'file' not in request.files:
+            return render_template('error.html', message="No file uploaded for batch prediction.")
+
+        file = request.files['file']
+        if file.filename == '':
+            return render_template('error.html', message="No file selected for batch prediction.")
+
+        # Determine file type and read the file
+        if file.filename.endswith('.csv'):
+            df = pd.read_csv(file)
+        elif file.filename.endswith('.xlsx'):
+            df = pd.read_excel(file)
+        else:
+            return render_template('error.html', message="Unsupported file format. Please upload a CSV or Excel file.")
+
+        app.logger.debug(f"Batch prediction data: {df.head()}")
+
+        # Apply feature engineering
+        df = feature_engineering(df, is_training=False)
+
+        # Ensure only the required features are used
+        df = df[feature_columns]
+
+        # Scale the input data
+        df_scaled = scaler.transform(df)
+
+        # Batch predictions
+        predictions = model.predict(df_scaled)
+        df['predictions'] = predictions
+
+        # Save the results to a CSV file
+        output_csv = df.to_csv(index=False)
+        return Response(
+            output_csv,
+            mimetype="text/csv",
+            headers={"Content-Disposition": "attachment;filename=batch_predictions.csv"}
+        )
+
+    except Exception as e:
+        app.logger.error(f"Error occurred during batch prediction: {e}")
         return render_template('error.html', message=str(e)), 500
 
 if __name__ == "__main__":

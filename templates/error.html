@@ -3,27 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prediction Results</title>
+    <title>Error</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             text-align: center;
             margin-top: 50px;
         }
-        .result-box {
+        .error-box {
             padding: 20px;
-            border: 1px solid #ccc;
+            border: 1px solid #f44336;
             border-radius: 10px;
             margin: 20px auto;
             width: 50%;
-            background-color: #f9f9f9;
+            background-color: #ffe6e6;
         }
-        .result-box h2 {
-            margin-bottom: 10px;
-        }
-        .result-box p {
-            font-size: 1.2em;
-            font-weight: bold;
+        .error-box h2 {
+            color: #f44336;
         }
         .go-back {
             margin-top: 20px;
@@ -40,12 +36,10 @@
     </style>
 </head>
 <body>
-    <h1>Prediction Results</h1>
-    <div class="result-box">
-        <h2>Bagging Model Prediction:</h2>
-        <p>{{ bagging_prediction }}</p>
+    <div class="error-box">
+        <h2>An Error Occurred</h2>
+        <p>{{ message }}</p>
     </div>
-    
     <button class="go-back" onclick="window.location.href='/'">Go Back</button>
 </body>
 </html>
