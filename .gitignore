@@ -15,17 +15,7 @@ venv/
 loggging/
 *.log
 
-# Model files
-*.joblib
-*.pkl
-*.h5
-*.sav
 
-# Datasets
-*.csv
-*.tsv
-*.xlsx
-*.xls
 
 # System files
 .DS_Store
